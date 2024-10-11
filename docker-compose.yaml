@@ -1,6 +1,45 @@
-version: '3.8'
+version: "3.8"
 
 services:
+  # PostgreSQL for Police Backend
+  postgres-police:
+    image: postgres:16-alpine
+    container_name: thahawuru_postgres_police
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Pass@1234
+      POSTGRES_DB: thahawuru-police
+    ports:
+      - "5432:5432"
+    networks:
+      - thahawuru_network
+
+  # PostgreSQL for Wallet Backend
+  postgres-wallet:
+    image: postgres:16-alpine
+    container_name: thahawuru_postgres_wallet
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Pass@1234
+      POSTGRES_DB: thahawuru-wallet
+    ports:
+      - "5433:5432"
+    networks:
+      - thahawuru_network
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: thahawuru_pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: Pass@1234
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres-police
+      - postgres-wallet
+    networks:
+      - thahawuru_network
 
   # Police Backend Service (Spring Boot)
   police-backend:
@@ -29,7 +68,7 @@ services:
       - DATASOURCE_URL="//localhost:5432/thahawuru-wallet"
       - DATABASE_USERNAME="postgres"
       - DATABASE_PASSWORD="Pass@1234"
-      - DEP_TOKEN = depAPIAccessToken
+      - DEP_TOKEN=depAPIAccessToken
       - PORT="9000"
     ports:
       - "9000:9000"
@@ -55,7 +94,7 @@ services:
       context: ../Thahawuru-web-frontend
       dockerfile: Dockerfile
     ports:
-      - "3000:3000"  # Frontend port
+      - "3000:3000" # Frontend port
     networks:
       - thahawuru_network
     depends_on:
@@ -69,7 +108,7 @@ services:
       context: ../police-web
       dockerfile: Dockerfile
     ports:
-      - "3001:3000"  # Frontend port
+      - "3001:3000" # Frontend port
     networks:
       - thahawuru_network
     depends_on:
@@ -84,7 +123,7 @@ services:
       context: ../police-mobileApp
       dockerfile: Dockerfile
     ports:
-      - "19000:19000"  # Default Expo port for React Native
+      - "19000:19000" # Default Expo port for React Native
     networks:
       - thahawuru_network
     depends_on:
@@ -97,7 +136,7 @@ services:
       context: ../publpublic-mobileApp
       dockerfile: Dockerfile
     ports:
-      - "19001:19000"  # Default Expo port for React Native
+      - "19001:19000" # Default Expo port for React Native
     networks:
       - thahawuru_network
     depends_on:
