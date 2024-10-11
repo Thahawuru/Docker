@@ -131,7 +131,7 @@ services:
   general-public-wallet-app:
     container_name: thahawuru_general_public_wallet_app
     build:
-      context: ../publpublic-mobileApp
+      context: ../public-mobileApp
       dockerfile: Dockerfile
     ports:
       - "19001:19000" # Default Expo port for React Native
