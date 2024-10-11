@@ -1,0 +1,108 @@
+version: '3.8'
+
+services:
+
+  # Police Backend Service (Spring Boot)
+  police-backend:
+    container_name: thahawuru_police_backend
+    build:
+      context: ../police-backend
+      dockerfile: Dockerfile
+    environment:
+      - DATASOURCE_URL="//localhost:5432/thahawuru-police"
+      - DATABASE_USERNAME="postgres"
+      - DATABASE_PASSWORD="Pass@1234"
+      - PORT="6000"
+    ports:
+      - "6000:6000"
+    networks:
+      - thahawuru_network
+
+  # Wallet Backend Service (Spring Boot)
+  wallet-backend:
+    container_name: thahawuru_wallet_backend
+    build:
+      context: ../wallet-backend
+      dockerfile: Dockerfile
+    environment:
+      - MONGODB_DATABASE="thahawuru-wallet"
+      - DATASOURCE_URL="//localhost:5432/thahawuru-wallet"
+      - DATABASE_USERNAME="postgres"
+      - DATABASE_PASSWORD="Pass@1234"
+      - DEP_TOKEN = depAPIAccessToken
+      - PORT="9000"
+    ports:
+      - "9000:9000"
+    networks:
+      - thahawuru_network
+
+  # Blockchain Wallet Backend (Node.js, Solidity - Hardhat)
+  blockchain-wallet:
+    container_name: thahawuru_blockchain_wallet
+    build:
+      context: ../blockchain-wallet
+      dockerfile: Dockerfile
+    # environment:
+    ports:
+      - "8082:8082"
+    networks:
+      - thahawuru_network
+
+  # Thahawuru Web Frontend (React, Angular, etc.)
+  thahawuru-web:
+    container_name: thahawuru_web
+    build:
+      context: ../Thahawuru-web-frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"  # Frontend port
+    networks:
+      - thahawuru_network
+    depends_on:
+      - blockchain-wallet
+      - wallet-backend
+
+  # Police Web Frontend (React, Angular, etc.)
+  police-web:
+    container_name: thahawuru_police_web
+    build:
+      context: ../police-web
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3000"  # Frontend port
+    networks:
+      - thahawuru_network
+    depends_on:
+      - blockchain-wallet
+      - police-backend
+      - wallet-backend
+
+  # Police Mobile App (React Native, served for development)
+  police-app:
+    container_name: thahawuru_police_app
+    build:
+      context: ../police-mobileApp
+      dockerfile: Dockerfile
+    ports:
+      - "19000:19000"  # Default Expo port for React Native
+    networks:
+      - thahawuru_network
+    depends_on:
+      - police-backend
+
+  # General Public Wallet Mobile App (React Native, served for development)
+  general-public-wallet-app:
+    container_name: thahawuru_general_public_wallet_app
+    build:
+      context: ../publpublic-mobileApp
+      dockerfile: Dockerfile
+    ports:
+      - "19001:19000"  # Default Expo port for React Native
+    networks:
+      - thahawuru_network
+    depends_on:
+      - wallet-backend
+
+networks:
+  thahawuru_network:
+    driver: bridge
