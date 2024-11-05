@@ -95,7 +95,7 @@ services:
       - "8082:8082"
     networks:
       - thahawuru_network
-    entrypoint: ["/app/startup.sh"]
+    entrypoint: ["./startup.sh"]
 
   # Thahawuru Web Frontend (React, Angular, etc.)
   thahawuru-web:
